@@ -1,0 +1,41 @@
+name: Build Mac Universal Binary
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: '5.9'
+
+    - name: Build for macOS Universal (ARM64 + x86_64)
+      run: |
+        swift build -c release --arch arm64 --arch x86_64 -Xswiftc -static-stdlib
+        mkdir -p build/universal
+        lipo -create -output build/universal/SingBoxManager \
+          .build/arm64-apple-macosx/release/SingBoxManager \
+          .build/x86_64-apple-macosx/release/SingBoxManager
+
+    - name: Create Release Archive
+      run: |
+        mkdir -p SingBoxManager-Release
+        cp build/universal/SingBoxManager SingBoxManager-Release/
+        cp README.md SingBoxManager-Release/
+        zip -r SingBoxManager-macOS-universal.zip SingBoxManager-Release
+
+    - name: Upload Release Archive
+      uses: actions/upload-artifact@v4
+      with:
+        name: SingBoxManager-macOS-universal
+        path: SingBoxManager-macOS-universal.zip
