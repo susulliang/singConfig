@@ -14,14 +14,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Swift
-      uses: swift-actions/setup-swift@v1
-      with:
-        swift-version: '5.9'
-
-    - name: Build for macOS Universal (ARM64 + x86_64)
+    - name: Setup Xcode
       run: |
-        swift build -c release --arch arm64 --arch x86_64 -Xswiftc -static-stdlib
+        sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+        xcode-select -p
+
+    - name: Build for macOS ARM64
+      run: |
+        swift build -c release -Xswiftc -target -Xswiftc arm64-apple-macosx12
+
+    - name: Build for macOS x86_64
+      run: |
+        swift build -c release -Xswiftc -target -Xswiftc x86_64-apple-macosx12
+
+    - name: Create Universal Binary
+      run: |
         mkdir -p build/universal
         lipo -create -output build/universal/SingBoxManager \
           .build/arm64-apple-macosx/release/SingBoxManager \
