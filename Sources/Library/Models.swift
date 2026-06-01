@@ -21,7 +21,7 @@ struct VMessNode: Codable {
 struct Transport: Codable {
     let type: String
     let path: String?
-    let headers: [String: String]?
+    var headers: [String: String]?
     let service_name: String?
 
     enum CodingKeys: String, CodingKey {

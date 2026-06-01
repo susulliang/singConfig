@@ -46,12 +46,12 @@ actor SSHManager {
     }
 
     func execute(_ command: String) async throws -> (stdout: String, stderr: String) {
-        guard let channel = channel else {
+        guard channel != nil else {
             throw SSHError.notConnected
         }
 
-        var stdout = ""
-        var stderr = ""
+        let stdout = ""
+        let stderr = ""
 
         // This is a simplified implementation
         // In production, you'd need proper SSH channel handling
@@ -74,7 +74,7 @@ actor SSHManager {
 
 // MARK: - SSH Delegates
 
-class PasswordDelegate: NIOSSHClientUserAuthDelegate {
+class PasswordDelegate: NIOSSHClientUserAuthenticationDelegate {
     let username: String
     let password: String
 
@@ -83,7 +83,7 @@ class PasswordDelegate: NIOSSHClientUserAuthDelegate {
         self.password = password
     }
 
-    func nextAuthMethod(availableMethods: NIOSSHAvailableUserAuthMethods) -> NIOSSHUserAuthMethod? {
+    func nextAuthMethod(availableMethods: NIOSSHAvailableUserAuthMethods) -> NIOSSHUserAuthenticationMethod? {
         if availableMethods.contains(.password) {
             return .password(.init(username: username, password: password))
         }
@@ -91,9 +91,10 @@ class PasswordDelegate: NIOSSHClientUserAuthDelegate {
     }
 }
 
-class AcceptAllServerAuthDelegate: NIOSSHServerAuthDelegate {
+class AcceptAllServerAuthDelegate: NIOSSHClientServerAuthenticationDelegate {
     func validateHostKey(hostKey: NIOSSHPublicKey) -> EventLoopFuture<Void> {
-        return EventLoopFuture<Void>(result: .success(()), on: MultiThreadedEventLoopGroup(numberOfThreads: 1).next())
+        let eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
+        return eventLoop.makeSucceededFuture(())
     }
 }
 
@@ -118,3 +119,4 @@ enum SSHError: LocalizedError {
         }
     }
 }
+

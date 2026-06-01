@@ -140,13 +140,14 @@ struct ContentView: View {
         if connectionVM.isConnected {
             NodesListView(connectionVM: connectionVM, nodesVM: nodesVM)
         } else {
-            LoginView(connectionVM: connectionVM)
+            LoginView(connectionVM: connectionVM, nodesVM: nodesVM)
         }
     }
 }
 
 struct LoginView: View {
     @ObservedObject var connectionVM: ConnectionViewModel
+    @ObservedObject var nodesVM: NodesViewModel
 
     var body: some View {
         VStack(spacing: 20) {
@@ -162,11 +163,9 @@ struct LoginView: View {
             VStack(spacing: 15) {
                 TextField("Router IP", text: $connectionVM.routerIP)
                     .textFieldStyle(.roundedBorder)
-                    .textInputAutocapitalization(.never)
 
                 TextField("SSH User", text: $connectionVM.username)
                     .textFieldStyle(.roundedBorder)
-                    .textInputAutocapitalization(.never)
 
                 SecureField("Password", text: $connectionVM.password)
                     .textFieldStyle(.roundedBorder)
@@ -260,7 +259,7 @@ struct NodesListView: View {
             }
             .navigationTitle("Nodes")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Disconnect") {
                         Task {
                             await connectionVM.disconnect()
@@ -268,7 +267,7 @@ struct NodesListView: View {
                     }
                 }
 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showAddSheet = true }) {
                         Image(systemName: "plus")
                     }
@@ -375,9 +374,8 @@ struct AddNodeSheet: View {
             }
             .padding()
             .navigationTitle("Add Node")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     Button("Cancel") {
                         isPresented = false
                     }
