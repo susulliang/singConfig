@@ -25,7 +25,8 @@ let package = Package(
             dependencies: [
                 .product(name: "NIOSSH", package: "swift-nio-ssh"),
             ],
-            path: "Sources/Library"
+            path: "Sources/Library",
+            exclude: ["SwiftUIApp.swift"]
         ),
         .testTarget(
             name: "SingBoxManagerTests",
