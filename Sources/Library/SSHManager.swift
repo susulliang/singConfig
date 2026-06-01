@@ -83,18 +83,26 @@ class PasswordDelegate: NIOSSHClientUserAuthenticationDelegate {
         self.password = password
     }
 
-    func nextAuthMethod(availableMethods: NIOSSHAvailableUserAuthMethods) -> NIOSSHUserAuthenticationMethod? {
+    func nextAuthenticationType(
+        availableMethods: NIOSSHAvailableUserAuthenticationMethods,
+        nextChallengePromise: EventLoopPromise<NIOSSHUserAuthenticationOffer?>
+    ) {
         if availableMethods.contains(.password) {
-            return .password(.init(username: username, password: password))
+            let offer = NIOSSHUserAuthenticationOffer(
+                username: username,
+                serviceName: "",
+                offer: .password(.init(password: password))
+            )
+            nextChallengePromise.succeed(offer)
+        } else {
+            nextChallengePromise.succeed(nil)
         }
-        return nil
     }
 }
 
 class AcceptAllServerAuthDelegate: NIOSSHClientServerAuthenticationDelegate {
-    func validateHostKey(hostKey: NIOSSHPublicKey) -> EventLoopFuture<Void> {
-        let eventLoop = MultiThreadedEventLoopGroup(numberOfThreads: 1).next()
-        return eventLoop.makeSucceededFuture(())
+    func validateHostKey(hostKey: NIOSSHPublicKey, validationCompletePromise: EventLoopPromise<Void>) {
+        validationCompletePromise.succeed(())
     }
 }
 
