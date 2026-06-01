@@ -97,7 +97,7 @@ class ConsoleUI {
 
 struct MenuItem {
     let label: String
-    let action: (() async -> Void)?
+    let action: (() async throws -> Void)?
 }
 
 // MARK: - Application

@@ -259,7 +259,7 @@ struct NodesListView: View {
             }
             .navigationTitle("Nodes")
             .toolbar {
-                ToolbarItem(placement: .automatic) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Disconnect") {
                         Task {
                             await connectionVM.disconnect()
@@ -267,7 +267,7 @@ struct NodesListView: View {
                     }
                 }
 
-                ToolbarItem(placement: .automatic) {
+                ToolbarItem(placement: .confirmationAction) {
                     Button(action: { showAddSheet = true }) {
                         Image(systemName: "plus")
                     }
@@ -375,7 +375,7 @@ struct AddNodeSheet: View {
             .padding()
             .navigationTitle("Add Node")
             .toolbar {
-                ToolbarItem(placement: .automatic) {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
                         isPresented = false
                     }
